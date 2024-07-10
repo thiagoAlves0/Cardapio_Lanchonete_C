@@ -1,6 +1,4 @@
 const menu = document.getElementById("menu");
-
-console.log(menu);
 const cartBtn = document.getElementById("cart-btn");
 const cartModal = document.getElementById("cart-modal");
 const cartItemsContainer = document.getElementById("cart-items");
@@ -32,7 +30,6 @@ closeModalBtn.addEventListener("click", function () {
 });
 
 menu.addEventListener("click", function (event) {
-    //console.log(event.target)
     let parentButton = event.target.closest(".add-to-cart-btn");
 
     if (parentButton) {
@@ -131,12 +128,10 @@ addressInput.addEventListener("input", function (event) {
     }
 });
 
-//FINALIZAR PEDIDO
+// FINALIZAR PEDIDO
 checkoutBtn.addEventListener("click", function () {
-
     const isOpen = checkRestalrantOpen();
     if (!isOpen) {
-
         Toastify({
             text: "O Restaurante está fechado!",
             duration: 3000,
@@ -149,7 +144,6 @@ checkoutBtn.addEventListener("click", function () {
                 background: "linear-gradient(to right, #7c1c1c, #120504)",
             },
         }).showToast();
-
         return;
     }
 
@@ -160,7 +154,7 @@ checkoutBtn.addEventListener("click", function () {
         return;
     }
 
-    //Enviar pedido para o whatsapp
+    // Enviar pedido para o WhatsApp
     const cartItems = cart.map((item) => {
         return (
             ` ${item.name} Quantidade: (${item.quantity}) Preço: R$ ${item.price} |`
@@ -173,9 +167,13 @@ checkoutBtn.addEventListener("click", function () {
     // Adicionar a observação ao pedido
     const message = encodeURIComponent(`${cartItems}\n\nObservações: ${observation}\n\nEndereço: ${addressInput.value}`);
 
-    const phone = "83999309092";
+    const phone = "5583999309092"; // Adicionar código do país
 
-    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+    // Certifique-se de que a URL está corretamente formatada
+    const url = `https://wa.me/${phone}?text=${message}`;
+
+    console.log(url); // Verifique se a URL está correta
+    window.open(url, "_blank");
 
     cart = [];
     updateCartModal();
