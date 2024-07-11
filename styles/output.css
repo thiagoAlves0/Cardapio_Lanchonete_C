@@ -1952,7 +1952,7 @@ video {
 }
 
 .bg-home {
-  background-image: url('/assets/bg.png');
+  background-image: url('/assets/bg5.jpg');
 }
 
 .decoration-slice {
@@ -2264,6 +2264,11 @@ video {
 
 .text-\[\#336699\]\/\[\.35\] {
   color: rgb(51 102 153 / .35);
+}
+
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
 .text-blue-500 {
@@ -2795,12 +2800,3 @@ footer {
     }
   }
 }
-
-
-
-
-
-
-
-
-

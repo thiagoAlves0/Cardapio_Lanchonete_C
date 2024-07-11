@@ -167,7 +167,7 @@ checkoutBtn.addEventListener("click", function () {
     // Adicionar a observação ao pedido
     const message = encodeURIComponent(`${cartItems}\n\nObservações: ${observation}\n\nEndereço: ${addressInput.value}`);
 
-    const phone = "5583999309092"; // Adicionar código do país
+    const phone = "558399048716";
 
     // Certifique-se de que a URL está corretamente formatada
     const url = `https://wa.me/${phone}?text=${message}`;
@@ -184,7 +184,7 @@ checkoutBtn.addEventListener("click", function () {
 function checkRestalrantOpen() {
     const data = new Date();
     const hora = data.getHours();
-    return hora >= 7 && hora < 21; //true
+    return hora >= 7 && hora < 17; //true
 }
 
 const spanItem = document.getElementById("date-span");
