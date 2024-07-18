@@ -8,7 +8,9 @@ const closeModalBtn = document.getElementById("close-modal-btn");
 const cartCounter = document.getElementById("cart-count");
 const addressInput = document.getElementById("address");
 const addressWarn = document.getElementById("address-warn");
-const observationInput = document.getElementById("observation"); // Novo campo de observação
+const observationInput = document.getElementById("observation");
+const deliveryOptions = document.getElementsByName("delivery-option");
+const addressContainer = document.getElementById("address-container");
 
 let cart = [];
 
@@ -18,7 +20,8 @@ cartBtn.addEventListener("click", function () {
     cartModal.style.display = "flex";
     adjustCartModalHeight(); // Ajustar a altura máxima do modal quando ele for exibido
 });
-// funçao para fechar modal ao clicar fora
+
+// função para fechar modal ao clicar fora
 cartModal.addEventListener("click", function (event) {
     if (event.target === cartModal) {
         cartModal.style.display = "none";
@@ -128,6 +131,17 @@ addressInput.addEventListener("input", function (event) {
     }
 });
 
+// Mostrar ou ocultar o campo de endereço com base na opção de entrega
+Array.from(deliveryOptions).forEach(option => {
+    option.addEventListener("change", function () {
+        if (this.value === "delivery") {
+            addressContainer.style.display = "block";
+        } else {
+            addressContainer.style.display = "none";
+        }
+    });
+});
+
 // FINALIZAR PEDIDO
 checkoutBtn.addEventListener("click", function () {
     const isOpen = checkRestalrantOpen();
@@ -148,29 +162,28 @@ checkoutBtn.addEventListener("click", function () {
     }
 
     if (cart.length === 0) return;
-    if (addressInput.value === "") {
-        addressWarn.classList.remove("hidden");
-        addressInput.classList.add("border-red-500");
-        return;
-    }
 
-    // Enviar pedido para o WhatsApp
-    const cartItems = cart.map((item) => {
-        return (
-            ` ${item.name} Quantidade: (${item.quantity}) Preço: R$ ${item.price} |`
-        );
-    }).join("");
+    let message = cart.map(item => ` ${item.name} Quantidade: (${item.quantity}) Preço: R$ ${item.price} |`).join("");
 
     // Pegar a observação do cliente
     const observation = observationInput.value;
 
     // Adicionar a observação ao pedido
-    const message = encodeURIComponent(`${cartItems}\n\nObservações: ${observation}\n\nEndereço: ${addressInput.value}`);
+    message += `\n\nObservações: ${observation}`;
+
+    if (document.querySelector('input[name="delivery-option"]:checked').value === "delivery") {
+        if (addressInput.value === "") {
+            addressWarn.classList.remove("hidden");
+            addressInput.classList.add("border-red-500");
+            return;
+        }
+        message += `\n\nEndereço: ${addressInput.value}`;
+    } else {
+        message += `\n\nRetirada no local.`;
+    }
 
     const phone = "558399048716";
-
-    // Certifique-se de que a URL está corretamente formatada
-    const url = `https://wa.me/${phone}?text=${message}`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
     console.log(url); // Verifique se a URL está correta
     window.open(url, "_blank");
@@ -218,4 +231,11 @@ cartBtn.addEventListener("click", function () {
 
     // Ajustar a altura máxima do modal quando ele for exibido
     adjustCartModalHeight();
+});
+
+const addObservationBtn = document.getElementById('add-observation-btn');
+const observationContainer = document.getElementById('observation-container');
+
+addObservationBtn.addEventListener('click', function () {
+    observationContainer.classList.toggle('hidden');
 });
