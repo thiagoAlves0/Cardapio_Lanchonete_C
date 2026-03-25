@@ -25,10 +25,7 @@
 
 <body>
 
-  <!-- ══════════════════════════════════════
-       HEADER
-  ══════════════════════════════════════ -->
-  <header class="lc-header">
+<header class="lc-header">
     <div class="lc-header__topbar"></div>
 
     <div class="lc-header-content">
@@ -40,9 +37,9 @@
         <div class="lc-brand-compact">
           <h1>Lanchonete <em>Central</em></h1>
 
-          <div class="lc-status-simple">
+          <div class="lc-status-badge">
             <span class="status-dot status-open"></span>
-            <span>Aberto até 23h</span>
+            <span class="status-text">Aberto <span class="status-time">• 07h às 17h</span></span>
           </div>
         </div>
 
@@ -51,24 +48,26 @@
         </a>
       </div>
 
-      <div class="lc-info-bar">
-        <a href="#" class="lc-info-link"><i class="fas fa-map-marker-alt"></i> Dr. Francisco Feitosa</a>
-        <span class="sep">•</span>
-        <a href="tel:+5583998775498" class="lc-info-link"><i class="fab fa-whatsapp"></i> (83) 9 9877-5498</a>
-        <span class="sep">•</span>
-        <span class="lc-info-link"><i class="fas fa-wallet"></i> Cartão / Pix / Dinheiro</span>
+      <div class="lc-info-chips">
+        <a href="#" class="lc-info-btn">
+          <i class="fas fa-map-marker-alt"></i> Dr. Francisco Feitosa
+        </a>
+        <a href="tel:+5583998775498" class="lc-info-btn">
+          <i class="fab fa-whatsapp"></i> (83) 9 9877-5498
+        </a>
+        <span class="lc-info-btn lc-info-btn--static">
+          <i class="fas fa-wallet"></i> Cartão / Pix / Dinheiro
+        </span>
       </div>
     </div>
   </header>
 
-  <!-- ══════════════════════════════════════
-       NAV STICKY
-  ══════════════════════════════════════ -->
-  <div class="lc-nav-wrapper">
+<div class="lc-nav-wrapper">
     <div class="lc-nav-inner-wrap">
+      
       <div class="lc-nav-inner">
         <nav class="lc-nav" id="category-nav">
-          <button class="cat-btn active" data-target="sec-fs">🥪 F's</button>
+          <button class="cat-btn active" data-target="sec-fs">🍔 F's</button>
           <button class="cat-btn" data-target="sec-tradicionais">🍔 Tradicionais</button>
           <button class="cat-btn" data-target="sec-especiais">⭐ Especiais</button>
           <button class="cat-btn" data-target="sec-salgados">🥐 Salgados</button>
@@ -79,27 +78,21 @@
           <button class="cat-btn" data-target="sec-tapiocas">🫔 Tapiocas</button>
           <button class="cat-btn" data-target="sec-bebidas">🥤 Bebidas</button>
         </nav>
-        <button class="cat-btn--search" id="search-toggle" aria-label="Buscar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
+
+        <button id="search-toggle" class="cat-btn--search" aria-label="Buscar">
+          <i class="fas fa-search"></i>
           <span class="search-text">Buscar</span>
         </button>
-      </div><!-- /lc-nav-inner -->
-    </div><!-- /lc-nav-inner-wrap -->
+      </div>
 
-    <!-- Overlay de busca — desliza sobre a nav -->
-    <div class="lc-search-overlay" id="search-overlay">
-      <svg class="lc-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.35-4.35" />
-      </svg>
-      <input type="text" id="search-input" class="lc-search-overlay__input" placeholder="Buscar no cardápio..."
-        autocomplete="off" />
-      <button class="lc-search-overlay__close" id="search-close">✕</button>
+      <div id="search-overlay" class="lc-search-overlay">
+        <i class="fas fa-search lc-search-icon"></i>
+        <input type="text" id="search-input" class="lc-search-overlay__input" placeholder="Buscar no cardápio...">
+        <button id="search-close" class="lc-search-overlay__close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
     </div>
   </div>
   <div class="lc-no-results" id="no-results">
@@ -1257,9 +1250,7 @@
     <div class="menu-grid">
       <!--produtos-->
       <div class="menu-card">
-        <img src="assets/cuscuz.png
-  
-  " alt="Cuscuz rechado grande" class="menu-card__img" />
+        <img src="assets/cuscuz.png" alt="Cuscuz rechado grande" class="menu-card__img" />
         <div class="menu-card__body">
           <p class="menu-card__name">Cuscuz rechado grande</p>
           <div class="menu-card__footer">

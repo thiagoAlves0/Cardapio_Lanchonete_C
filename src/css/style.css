@@ -34,6 +34,7 @@ body {
   color: var(--dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* ════════════════════════════════════════════
@@ -85,10 +86,10 @@ body {
 }
 
 .lc-header-content {
-  padding: 18px 20px 16px;
+  padding: 20px 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -126,6 +127,8 @@ body {
   flex-direction: column;
   gap: 6px;
   justify-content: center;
+  min-width: 0;           /* impede overflow do flex */
+  padding-right: 32px;    /* espaço para o .lc-dev-link absoluto no mobile */
 }
 
 .lc-brand-compact h1 {
@@ -136,6 +139,9 @@ body {
   margin: 0;
   line-height: 1.05;
   letter-spacing: -0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lc-brand-compact em {
@@ -143,15 +149,16 @@ body {
   font-style: italic;
 }
 
-/* Indicador de Estado do Estabelecimento */
-.lc-status-simple {
-  display: flex;
+/* ── STATUS: PÍLULA ELEGANTE COM ESPAÇAMENTO ── */
+.lc-status-badge {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-sans);
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 12px;
+  border-radius: 99px;
+  width: fit-content;
 }
 
 .status-dot {
@@ -159,56 +166,87 @@ body {
   height: 8px;
   border-radius: 50%;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .status-open {
   background: var(--green);
-  box-shadow: 0 0 10px var(--green);
+  box-shadow: 0 0 8px var(--green);
   animation: lcPulse 2s infinite ease-in-out;
 }
 
 .status-closed {
   background: #f87171;
-  box-shadow: 0 0 10px #f87171;
+  box-shadow: 0 0 8px #f87171;
 }
 
-/* Barra de Informações Úteis */
-.lc-info-bar {
+.status-text {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.status-time {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+/* ── INFOS: BOTÕES CLICÁVEIS PARA O MOBILE ── */
+.lc-info-chips {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 12px;
+  gap: 8px;
+  overflow: hidden;
 }
 
-.lc-info-link {
+.lc-info-btn {
   font-family: var(--font-sans);
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 14px;
+  border-radius: 12px;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
-  transition: color 0.2s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.lc-info-link:hover {
-  color: #ffffff;
+.lc-info-btn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.15);
 }
 
-.lc-info-link i {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.85rem;
-  transition: color 0.2s ease;
-}
-
-.lc-info-link:hover i {
+.lc-info-btn i {
   color: var(--gold);
+  font-size: 0.9rem;
 }
 
-.sep {
-  color: rgba(255, 255, 255, 0.15);
-  font-size: 0.6rem;
+/* Item não clicável (Cartão/Pix) */
+.lc-info-btn--static {
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lc-info-btn--static:active {
+  transform: none;
+  background: transparent;
+}
+
+.lc-info-btn--static i {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* Assinatura do Desenvolvedor */
@@ -228,27 +266,22 @@ body {
 }
 
 /* ════════════════════════════════════════════
-   NAVEGAÇÃO DE CATEGORIAS (STICKY DINÂMICO)
+   NAVEGAÇÃO DE CATEGORIAS (100% FIXA)
 ════════════════════════════════════════════ */
 .lc-nav-wrapper {
   position: -webkit-sticky;
-  position: sticky !important;
+  position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
+  background: #111111;
 }
 
 .lc-nav-inner-wrap {
-  background: var(--dark);
-  border-bottom: 1px solid rgba(250, 204, 21, 0.15);
+  position: relative;
+  background: #111111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  transform: translateY(0);
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.lc-nav-wrapper.nav-hidden .lc-nav-inner-wrap {
-  transform: translateY(-100%);
 }
 
 .lc-nav-inner {
@@ -260,6 +293,7 @@ body {
   margin: 0 auto;
 }
 
+/* Sombra gradual na direita para esconder o menu sumindo sob a lupa */
 .lc-nav-inner::after {
   content: '';
   position: absolute;
@@ -267,7 +301,7 @@ body {
   top: 0;
   bottom: 0;
   width: 48px;
-  background: linear-gradient(to right, transparent, var(--dark));
+  background: linear-gradient(to right, transparent, #111111);
   pointer-events: none;
   z-index: 1;
 }
@@ -282,6 +316,8 @@ body {
   padding: 0 8px 0 16px;
   gap: 0;
   overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
 }
 
 .lc-nav::-webkit-scrollbar {
@@ -289,7 +325,7 @@ body {
 }
 
 [id^="sec-"] {
-  scroll-margin-top: 60px;
+  scroll-margin-top: 64px;
 }
 
 .cat-btn {
@@ -327,20 +363,14 @@ body {
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.cat-btn:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
+.cat-btn:hover { color: rgba(255, 255, 255, 0.8); }
+.cat-btn.active { color: #ffffff; font-weight: 700; }
+.cat-btn.active::after { transform: scaleX(1); }
+.cat-btn i { font-size: 0.9rem; margin-right: 2px; }
 
-.cat-btn.active {
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.cat-btn.active::after {
-  transform: scaleX(1);
-}
-
-/* Botão de Pesquisa Integrado */
+/* ════════════════════════════════════════════
+   BOTÃO DE LUPA E INTERFACE DE PESQUISA
+════════════════════════════════════════════ */
 .cat-btn--search {
   appearance: none;
   flex-shrink: 0;
@@ -350,7 +380,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: none;
+  background: #111111;
   border: none;
   border-left: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.5);
@@ -375,9 +405,7 @@ body {
   color: var(--gold);
 }
 
-/* ════════════════════════════════════════════
-   INTERFACE DE PESQUISA (OVERLAY)
-════════════════════════════════════════════ */
+/* OVERLAY (BARRA DE DIGITAÇÃO) */
 .lc-search-overlay {
   position: absolute;
   inset: 0;
@@ -386,8 +414,8 @@ body {
   align-items: center;
   gap: 12px;
   padding: 0 12px 0 20px;
-  background: #1c1308;
-  border-bottom: 2px solid transparent;
+  background: #111111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -395,6 +423,7 @@ body {
   z-index: 10;
 }
 
+/* CLASSE QUE O SEU JAVASCRIPT USA PARA ABRIR A BUSCA */
 .lc-search-overlay.open {
   opacity: 1;
   visibility: visible;
@@ -1132,6 +1161,14 @@ body {
   .menu-grid { gap: 6px; padding-bottom: 30px; }
 }
 
+/* Laptops médios (768px–1023px): nav ainda scrollável, itens mais compactos */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cat-btn { font-size: 0.78rem; padding: 0 11px; }
+  .cat-btn--search { width: 48px; }
+  .cat-btn--search .search-text { display: none; }
+  .lc-nav-inner::after { display: block; } /* mantém fade para indicar scroll */
+}
+
 /* Ecrãs Desktop (≥ 1024px) */
 @media (min-width: 1024px) {
   /* Otimização do Cabeçalho e Identidade no Desktop */
@@ -1143,7 +1180,8 @@ body {
   }
   .lc-header-main { gap: 24px; }
   .lc-logo-compact { width: 96px; height: 96px; }
-  .lc-brand-compact h1 { font-size: 2.4rem; }
+  .lc-brand-compact { padding-right: 0; }      /* dev-link é static no desktop */
+  .lc-brand-compact h1 { font-size: 2.4rem; white-space: normal; }
   
   /* Disposição Lateral das Informações do Estabelecimento */
   .lc-info-bar { flex-direction: column; align-items: flex-end; gap: 8px; }
@@ -1153,9 +1191,16 @@ body {
   /* Ajustes da Navegação para Desktop */
   .lc-nav-inner { justify-content: center; }
   .lc-nav-inner::after { display: none; }
-  .lc-nav { overflow-x: visible; flex-wrap: nowrap; justify-content: center; padding: 0 16px; }
-  .cat-btn { font-size: 0.88rem; padding: 0 20px; }
-  .cat-btn--search { width: auto; padding: 0 20px; border-left: none; border-right: 1px solid rgba(255,255,255,0.08); margin-right: 12px; }
+  .lc-nav { overflow-x: visible; flex-wrap: nowrap; justify-content: center; padding: 0 8px; }
+  .cat-btn { font-size: 0.82rem; padding: 0 13px; }
+  .cat-btn--search {
+    width: auto;
+    padding: 0 18px;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    border-right: none;
+    margin-right: 0;
+    flex-shrink: 0;
+  }
   .cat-btn--search .search-text { display: inline; }
 
   /* Catálogo de Produtos dispostos em grelha robusta */
@@ -1173,9 +1218,9 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 48px 24px 20px;
-    text-align: left;
+    text-align: center;
   }
-  .section-title::after { margin: 0; }
+  .section-title::after { margin: 0 auto; }
 
   /* Otimização da Sobreposição da Pesquisa */
   .lc-search-overlay {
@@ -1201,7 +1246,8 @@ body {
 @media (max-width: 359px) {
   .lc-brand-compact h1 { font-size: 1.4rem; }
   .lc-logo-compact { width: 56px; height: 56px; }
-  .lc-info-link { font-size: 0.65rem; }
-  .cat-btn { font-size: 0.75rem; padding: 0 12px; }
+  .lc-info-btn { font-size: 0.65rem; padding: 6px 10px; }
+  .cat-btn { font-size: 0.72rem; padding: 0 10px; }
   .menu-card__img { width: 84px; height: 84px; }
+  .lc-brand-compact { padding-right: 28px; }
 }
