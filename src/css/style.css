@@ -153,17 +153,17 @@ body {
 .lc-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 99px;
   width: fit-content;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
@@ -171,18 +171,18 @@ body {
 
 .status-open {
   background: var(--green);
-  box-shadow: 0 0 8px var(--green);
+  box-shadow: 0 0 6px var(--green);
   animation: lcPulse 2s infinite ease-in-out;
 }
 
 .status-closed {
   background: #f87171;
-  box-shadow: 0 0 8px #f87171;
+  box-shadow: 0 0 6px #f87171;
 }
 
 .status-text {
   font-family: var(--font-sans);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--green);
 }
@@ -190,7 +190,7 @@ body {
 .status-time {
   color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
-  margin-left: 4px;
+  margin-left: 3px;
 }
 
 /* ── INFOS: BOTÕES CLICÁVEIS PARA O MOBILE ── */
@@ -198,6 +198,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   overflow: hidden;
 }
@@ -226,7 +227,7 @@ body {
 }
 
 .lc-info-btn i {
-  color: var(--gold);
+  color: #ef4444;  
   font-size: 0.9rem;
 }
 
@@ -428,13 +429,13 @@ body {
   opacity: 1;
   visibility: visible;
   pointer-events: all;
-  border-bottom-color: var(--orange);
+  border-bottom-color: var(--gold);
   transition: opacity 0.2s ease, visibility 0s 0s;
 }
 
 .lc-search-icon {
   flex-shrink: 0;
-  color: var(--orange);
+  color: var(--gold);
   font-size: 1.1rem;
 }
 
@@ -447,7 +448,7 @@ body {
   font-size: 0.95rem;
   font-weight: 400;
   color: #ffffff;
-  caret-color: var(--orange);
+  caret-color: var(--gold);
   height: 100%;
 }
 
@@ -808,7 +809,14 @@ body {
 .lc-modal__handle {
   display: flex;
   justify-content: center;
-  padding: 12px 0 8px;
+  padding: 16px 0 10px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.lc-modal__handle:active {
+  cursor: grabbing;
 }
 
 .lc-modal__handle-bar {
@@ -927,6 +935,52 @@ body {
 }
 
 .delivery-pill.pill-inactive, .pickup-pill.pill-inactive {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0.8;
+}
+
+/* Toggle de Pagamento (3 colunas) */
+.lc-payment-toggle {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5px;
+}
+
+.lc-payment-toggle label {
+  cursor: pointer;
+  user-select: none;
+}
+
+.lc-payment-toggle input[type="radio"] {
+  display: none;
+}
+
+.payment-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 6px;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: background 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+  white-space: nowrap;
+}
+
+.payment-pill.pill-active {
+  background: var(--gold);
+  color: #111111;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(250, 180, 0, 0.2);
+}
+
+.payment-pill.pill-inactive {
   background: transparent;
   color: rgba(255, 255, 255, 0.4);
   opacity: 0.8;
@@ -1250,4 +1304,150 @@ body {
   .cat-btn { font-size: 0.72rem; padding: 0 10px; }
   .menu-card__img { width: 84px; height: 84px; }
   .lc-brand-compact { padding-right: 28px; }
+}
+/* ════════════════════════════════════════════
+   TELAS PEQUENAS (altura ≤ 700px — ex: iPhone SE)
+   Compacta o footer e o estado vazio para
+   garantir que o botão "Repetir pedido" apareça
+════════════════════════════════════════════ */
+@media (max-height: 700px) {
+
+  /* Footer: menos padding e gap menores */
+  .lc-modal__footer {
+    padding: 14px 20px 20px;
+    gap: 11px;
+  }
+
+  /* Pills de entrega mais finas */
+  .delivery-pill,
+  .pickup-pill {
+    padding: 9px 10px;
+  }
+
+  /* Pills de pagamento mais finas */
+  .payment-pill {
+    padding: 8px 6px;
+  }
+
+  /* Linha de checkout: menos margem superior */
+  .lc-checkout-row {
+    margin-top: 2px;
+  }
+
+  /* Estado vazio: padding compacto */
+  .lc-cart-empty-state {
+    padding: 16px 20px 12px !important;
+  }
+
+  /* Ícone do carrinho vazio: some em telas pequenas */
+  .lc-cart-empty-icon {
+    display: none !important;
+  }
+}
+/* ════════════════════════════════════════════
+   DEV CARD
+════════════════════════════════════════════ */
+.lc-logo-compact {
+  cursor: pointer;
+}
+
+.dev-card-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0s 0.25s;
+}
+
+.dev-card-overlay.dev-card--open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.25s ease;
+}
+
+.dev-card {
+  background: #141414;
+  border: 1px solid rgba(250,204,21,0.2);
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 320px;
+  width: 100%;
+  position: relative;
+  text-align: center;
+  animation: lcFadeUp 0.3s var(--ease-spring) both;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+}
+
+.dev-card__label {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 8px;
+}
+
+.dev-card__name {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--gold);
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+
+.dev-card__desc {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.55;
+  margin: 0 0 24px;
+}
+
+.dev-card__btn {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  color: #111;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 14px 28px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 6px 20px rgba(250,180,0,0.25);
+}
+
+.dev-card__btn:hover  { opacity: 0.9; }
+.dev-card__btn:active { transform: scale(0.96); }
+
+.dev-card__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dev-card__close:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
 }

@@ -1,10 +1,12 @@
 // src/js/modules/CartManager.js
 
-const CART_KEY       = 'lc_cart';
-const LAST_ORDER_KEY = 'lc_last_order';
-const MAX_QTY        = 99;
-const MAX_NOTE_LEN   = 120;
-const MAX_ITEMS      = 50;
+const CART_KEY          = 'lc_cart';
+const LAST_ORDER_KEY    = 'lc_last_order';
+const ORDER_COUNTER_KEY = 'lc_order_counter';
+const ITEM_STATS_KEY    = 'lc_item_stats';
+const MAX_QTY           = 99;
+const MAX_NOTE_LEN      = 120;
+const MAX_ITEMS         = 50;
 
 class CartManager {
     constructor() {
@@ -70,13 +72,14 @@ class CartManager {
         this._saveToStorage();
     }
 
-    saveLastOrder(cart, deliveryOption, address, observation) {
+    saveLastOrder(cart, deliveryOption, address, observation, paymentMethod) {
         try {
             const lastOrder = {
                 cart:           cart.map(i => ({ ...i })),
                 deliveryOption: deliveryOption === 'pickup' ? 'pickup' : 'delivery',
                 address:        String(address).slice(0, 200),
                 observation:    String(observation).slice(0, 300),
+                paymentMethod:  String(paymentMethod || 'Pix'),
                 date:           new Date().toISOString()
             };
             localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(lastOrder));
@@ -91,6 +94,43 @@ class CartManager {
             return data ? JSON.parse(data) : null;
         } catch {
             return null;
+        }
+    }
+
+    // Incrementa e retorna o próximo número de pedido (contínuo, nunca reseta)
+    getNextOrderNumber() {
+        try {
+            const current = parseInt(localStorage.getItem(ORDER_COUNTER_KEY) || '0');
+            const next = current + 1;
+            localStorage.setItem(ORDER_COUNTER_KEY, String(next));
+            return next;
+        } catch {
+            return 1;
+        }
+    }
+
+    // Registra quais itens foram pedidos e quantas vezes (para análise futura)
+    trackItems(cart) {
+        try {
+            const stats = JSON.parse(localStorage.getItem(ITEM_STATS_KEY) || '{}');
+            cart.forEach(item => {
+                stats[item.name] = (stats[item.name] || 0) + item.quantity;
+            });
+            localStorage.setItem(ITEM_STATS_KEY, JSON.stringify(stats));
+        } catch (e) {
+            console.warn('CartManager: falha ao salvar estatísticas.', e);
+        }
+    }
+
+    // Retorna ranking dos itens mais pedidos
+    getItemStats() {
+        try {
+            const stats = JSON.parse(localStorage.getItem(ITEM_STATS_KEY) || '{}');
+            return Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .map(([name, count]) => ({ name, count }));
+        } catch {
+            return [];
         }
     }
 

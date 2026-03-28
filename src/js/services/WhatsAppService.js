@@ -1,6 +1,6 @@
 // src/js/services/WhatsAppService.js
 
-const PHONE = '5583998775498';
+const PHONE = '5583999048716';
 
 class WhatsAppService {
     constructor(phone = PHONE) {
@@ -8,37 +8,50 @@ class WhatsAppService {
         this.baseURL = 'https://wa.me';
     }
 
-    formatOrder(cart, deliveryOption, address = '', observation = '') {
-        let message = '🛒 *PEDIDO - Lanchonete Central*\n\n';
+    formatOrder(cart, deliveryOption, address = '', observation = '', orderNumber = 1, paymentMethod = 'Pix') {
+        const now    = new Date();
+        const time   = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const padded = String(orderNumber).padStart(4, '0');
+        const SEP    = '--------------------';
 
+        let message = `*PEDIDO #${padded} \u2014 Lanchonete Central*\n`;
+        message    += `Hoje \u00e0s ${time}\n`;
+        message    += `${SEP}\n\n`;
+
+        let totalUnits = 0;
         cart.forEach(item => {
-            const itemTotal = (item.price * item.quantity).toFixed(2);
-            message += `• ${item.name} (${item.quantity}x) — R$ ${itemTotal}\n`;
+            totalUnits += item.quantity;
+            message += `*${item.quantity}x* ${item.name}\n`;
             if (item.note && item.note.trim()) {
-                message += `  ↳ _${item.note.trim()}_\n`;
+                message += `  \u21b3 _${item.note.trim()}_\n`;
             }
         });
 
         const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-        message += `\n💰 *TOTAL: R$ ${total.toFixed(2)}*\n\n`;
+        const unit  = totalUnits === 1 ? 'unidade' : 'unidades';
+
+        message += `\n${SEP}\n`;
+        message += `*${totalUnits} ${unit} no total*\n`;
+        message += `*TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n`;
+        message += `*PAGAMENTO: ${paymentMethod}*\n`;
+        message += `${SEP}\n\n`;
 
         if (deliveryOption === 'delivery') {
-            message += `📍 *ENTREGA*\n${address}\n`;
+            message += `*ENTREGA*\n${address}\n`;
         } else {
-            message += `🏪 *RETIRADA NO LOCAL*\n`;
+            message += `*RETIRADA NO LOCAL*\n`;
         }
 
         if (observation.trim()) {
-            message += `\n📝 *OBS. GERAIS:*\n${observation}\n`;
+            message += `\n*OBS:* _${observation}_\n`;
         }
 
-        message += `\n_Enviado via Cardápio Digital_`;
         return message;
     }
 
-    sendOrder(cart, deliveryOption, address = '', observation = '') {
+    sendOrder(cart, deliveryOption, address = '', observation = '', orderNumber = 1, paymentMethod = 'Pix') {
         try {
-            const message = this.formatOrder(cart, deliveryOption, address, observation);
+            const message = this.formatOrder(cart, deliveryOption, address, observation, orderNumber, paymentMethod);
             const url     = `${this.baseURL}/${this.phone}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank', 'noopener,noreferrer');
             return true;

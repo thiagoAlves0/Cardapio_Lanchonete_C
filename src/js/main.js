@@ -16,6 +16,7 @@ const observationContainer = document.getElementById('observation-container');
 const addObservationBtn = document.getElementById('add-observation-btn');
 const addressContainer = document.getElementById('address-container');
 const deliveryOptions = document.getElementsByName('delivery-option');
+const paymentOptions  = document.getElementsByName('payment-option');
 const footerBar = document.getElementById('footer-bar');
 
 const cartManager = new CartManager();
@@ -168,8 +169,8 @@ function updateCartModal() {
         }
 
         cartItemsContainer.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px 24px;gap:10px;opacity:.5;">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round">
+        <div class="lc-cart-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px 24px;gap:10px;opacity:.5;">
+          <svg class="lc-cart-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round">
             <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
           </svg>
@@ -291,13 +292,21 @@ function _repeatLastOrder() {
         addObservationBtn.textContent = '− Remover observação';
     }
 
+    if (lastOrder.paymentMethod) {
+        const paymentRadio = document.querySelector(`input[name="payment-option"][value="${lastOrder.paymentMethod}"]`);
+        if (paymentRadio) {
+            paymentRadio.checked = true;
+            paymentRadio.dispatchEvent(new Event('change'));
+        }
+    }
+
     updateCartModal();
 }
 
 addressInput.addEventListener('input', () => {
     if (addressInput.value.trim() !== '') {
         addressInput.classList.remove('border-red-500');
-        addressWarn.classList.add('hidden');
+        addressWarn.style.display = 'none';
     }
 });
 
@@ -320,6 +329,20 @@ Array.from(deliveryOptions).forEach(option => {
     });
 });
 
+Array.from(paymentOptions).forEach(option => {
+    option.addEventListener('change', function () {
+        document.querySelectorAll('.payment-pill').forEach(pill => {
+            pill.classList.remove('pill-active');
+            pill.classList.add('pill-inactive');
+        });
+        const activePill = this.closest('label').querySelector('.payment-pill');
+        if (activePill) {
+            activePill.classList.add('pill-active');
+            activePill.classList.remove('pill-inactive');
+        }
+    });
+});
+
 checkoutBtn.addEventListener('click', () => {
     if (!checkRestalrantOpen()) {
         Toastify({
@@ -337,19 +360,22 @@ checkoutBtn.addEventListener('click', () => {
     const cart = cartManager.getCart();
     if (cart.length === 0) return;
 
-    const deliveryOption = document.querySelector('input[name="delivery-option"]:checked').value;
-    const address = addressInput.value.trim();
-    const observation = observationInput.value.trim();
+    const deliveryOption  = document.querySelector('input[name="delivery-option"]:checked').value;
+    const paymentMethod   = document.querySelector('input[name="payment-option"]:checked')?.value || 'Pix';
+    const address         = addressInput.value.trim();
+    const observation     = observationInput.value.trim();
 
     if (deliveryOption === 'delivery' && address === '') {
-        addressWarn.classList.remove('hidden');
+        addressWarn.style.display = 'block';
         addressInput.classList.add('border-red-500');
         addressInput.focus();
         return;
     }
 
-    cartManager.saveLastOrder(cart, deliveryOption, address, observation);
-    whatsAppService.sendOrder(cart, deliveryOption, address, observation);
+    const orderNumber = cartManager.getNextOrderNumber();
+    cartManager.trackItems(cart);
+    cartManager.saveLastOrder(cart, deliveryOption, address, observation, paymentMethod);
+    whatsAppService.sendOrder(cart, deliveryOption, address, observation, orderNumber, paymentMethod);
 
     cartManager.clear();
     observationInput.value = '';
@@ -361,27 +387,33 @@ checkoutBtn.addEventListener('click', () => {
 });
 
 function checkRestalrantOpen() {
-    return true; 
+    const now = new Date();
+    const day = now.getDay();
+    const totalMin = now.getHours() * 60 + now.getMinutes();
+    return day >= 1 && day <= 6 && totalMin >= 6 * 60 + 30 && totalMin < 17 * 60;
 }
 
-const spanItem = document.getElementById('date-span');
-if (spanItem) {
+// ── Atualiza badge de aberto/fechado ─────────────────────────────────
+(function updateStatusBadge() {
+    const badge    = document.querySelector('.lc-status-badge');
+    const dot      = badge?.querySelector('.status-dot');
+    const textSpan = badge?.querySelector('.status-text');
+    if (!badge) return;
+
     if (checkRestalrantOpen()) {
-        spanItem.style.cssText = 'display:inline-flex;align-items:center;gap:8px;background:rgba(22,163,74,0.15);border:1px solid rgba(22,163,74,0.35);padding:8px 20px;border-radius:9999px;margin-top:4px;';
-        spanItem.innerHTML = `
-        <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;box-shadow:0 0 8px #4ade80;animation:lcPulse 1.5s ease infinite;"></span>
-        <span style="font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;color:#4ade80;">Aberto agora</span>
-        <span style="width:1px;height:12px;background:rgba(255,255,255,0.15);display:inline-block;"></span>
-        <span style="font-family:'DM Sans',sans-serif;font-size:.8rem;color:rgba(255,255,255,0.4);">Seg–Sáb · 7h às 17h</span>`;
+        dot?.classList.replace('status-closed', 'status-open') || dot?.classList.add('status-open');
+        if (textSpan) textSpan.innerHTML = 'Aberto <span class="status-time">• 06h30 às 17h</span>';
+        badge.style.background = 'rgba(22,163,74,0.1)';
+        badge.style.borderColor = 'rgba(22,163,74,0.25)';
+        if (textSpan) textSpan.style.color = '#4ade80';
     } else {
-        spanItem.style.cssText = 'display:inline-flex;align-items:center;gap:8px;background:rgba(153,27,27,0.2);border:1px solid rgba(153,27,27,0.4);padding:8px 20px;border-radius:9999px;margin-top:4px;';
-        spanItem.innerHTML = `
-        <span style="width:7px;height:7px;border-radius:50%;background:#f87171;display:inline-block;"></span>
-        <span style="font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;color:#f87171;">Fechado agora</span>
-        <span style="width:1px;height:12px;background:rgba(255,255,255,0.15);display:inline-block;"></span>
-        <span style="font-family:'DM Sans',sans-serif;font-size:.8rem;color:rgba(255,255,255,0.4);">Abre Seg–Sáb às 7h</span>`;
+        dot?.classList.replace('status-open', 'status-closed') || dot?.classList.add('status-closed');
+        if (textSpan) textSpan.innerHTML = 'Fechado <span class="status-time">• Abre Seg–Sáb às 6h30</span>';
+        badge.style.background = 'rgba(153,27,27,0.15)';
+        badge.style.borderColor = 'rgba(153,27,27,0.3)';
+        if (textSpan) textSpan.style.color = '#f87171';
     }
-}
+})();
 
 function adjustCartModalHeight() {
     cartModal.style.maxHeight = window.innerHeight + 'px';
@@ -496,3 +528,94 @@ if (searchInput)  searchInput.addEventListener('input', _runSearch);
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && searchOverlay?.classList.contains('open')) _closeSearch();
 });
+
+/*=============== DRAG TO CLOSE MODAL ===============*/
+(function () {
+    const handle  = document.querySelector('.lc-modal__handle');
+    const modal   = document.querySelector('.lc-modal');
+    if (!handle || !modal) return;
+
+    let startY   = 0;
+    let currentY = 0;
+    let dragging = false;
+
+    handle.addEventListener('touchstart', (e) => {
+        startY   = e.touches[0].clientY;
+        currentY = 0;
+        dragging = true;
+        // desliga transição durante o arrasto
+        modal.style.transition = 'none';
+    }, { passive: true });
+
+    handle.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        currentY = e.touches[0].clientY - startY;
+        // só arrasta para baixo
+        if (currentY < 0) currentY = 0;
+        modal.style.transform = `translateY(${currentY}px)`;
+    }, { passive: true });
+
+    handle.addEventListener('touchend', () => {
+        if (!dragging) return;
+        dragging = false;
+
+        // religa transição
+        modal.style.transition = '';
+
+        if (currentY > 120) {
+            // passou do limiar → fecha
+            modal.style.transform = 'translateY(100%)';
+            setTimeout(() => {
+                modal.style.transform = '';
+                _closeModal();
+            }, 350);
+        } else {
+            // não passou → volta
+            modal.style.transform = '';
+        }
+    });
+})();
+/*=============== DEV CARD + TOAST ===============*/
+const devCard        = document.getElementById('dev-card');
+const devCardOverlay = document.getElementById('dev-card-overlay');
+const logoBtn        = document.querySelector('.lc-logo-compact');
+
+function _openDevCard() {
+    devCardOverlay.classList.add('dev-card--open');
+}
+function _closeDevCard() {
+    devCardOverlay.classList.remove('dev-card--open');
+}
+
+if (logoBtn)        logoBtn.addEventListener('click', _openDevCard);
+if (devCardOverlay) devCardOverlay.addEventListener('click', (e) => {
+    if (e.target === devCardOverlay) _closeDevCard();
+});
+
+// Toast 1x por sessão
+if (!sessionStorage.getItem('dev_toast_shown')) {
+    setTimeout(() => {
+        Toastify({
+            text: '👨‍💻 Desenvolvido por @thlago.alves',
+            duration: 4000,
+            gravity: 'top',
+            position: 'center',
+            stopOnFocus: false,
+            onClick: () => window.open('https://instagram.com/thlago.alves', '_blank', 'noopener,noreferrer'),
+            style: {
+                background: 'rgba(20,20,20,0.96)',
+                border: '1px solid rgba(250,204,21,0.3)',
+                color: '#facc15',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '.85rem',
+                fontWeight: '600',
+                borderRadius: '12px',
+                padding: '12px 20px',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(12px)',
+                cursor: 'pointer'
+            }
+        }).showToast();
+        sessionStorage.setItem('dev_toast_shown', '1');
+    }, 1200);
+}
