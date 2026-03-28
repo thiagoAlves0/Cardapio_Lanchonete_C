@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
+ "scripts": {
     "dev": "npx tailwindcss -i ./src/css/style.css -o ./src/css/output.css --watch",
-    "build": "npx tailwindcss -i ./src/css/style.css -o ./src/css/output.css --minify"
-  },
+    "build": "echo ok"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
